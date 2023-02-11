@@ -3,6 +3,7 @@
 # Pin the default clang to a stable version.
 CLANG ?= clang-12
 CFLAGS := -target bpf -O2 -g -Wall -Werror $(CFLAGS)
+DOCKER ?= docker
 
 # Obtain an absolute path to the directory of the Makefile.
 # Assume the Makefile is in the root of the repository.
@@ -34,7 +35,7 @@ TARGETS := \
 
 # Build all ELF binaries using a Dockerized LLVM toolchain.
 docker-all:
-	docker run --rm --user "${UIDGID}" \
+	${DOCKER} run --rm --user "${UIDGID}" \
 		-v "${REPODIR}":/ebpf -w /ebpf --env MAKEFLAGS \
 		--env CFLAGS="-fdebug-prefix-map=/ebpf=." \
 		"${IMAGE}:${VERSION}" \
@@ -42,7 +43,7 @@ docker-all:
 
 # (debug) Drop the user into a shell inside the Docker container as root.
 docker-shell:
-	docker run --rm -ti \
+	${DOCKER} run --rm -ti \
 		-v "${REPODIR}":/ebpf -w /ebpf \
 		"${IMAGE}:${VERSION}"
 
